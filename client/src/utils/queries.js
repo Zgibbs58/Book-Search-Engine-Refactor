@@ -7,10 +7,12 @@ export const GET_ME = gql`
     email
     password
     savedBooks {
+      bookId
       authors
       description
-      bookId
+      title
       image
+      link
     }
   }
 `;

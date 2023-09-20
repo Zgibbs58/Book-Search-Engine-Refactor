@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { Container, Card, Button, Row, Col } from "react-bootstrap";
 import { GET_ME } from "../utils/queries";
-import { useQuery } from "@apollo/client";
+import { REMOVE_BOOK } from "../utils/mutations";
+import { useQuery, useMutation } from "@apollo/client";
 
 // import { getMe, deleteBook } from "../utils/API";
 import Auth from "../utils/auth";
@@ -13,7 +14,9 @@ const SavedBooks = () => {
   const { loading, error, data } = useQuery(GET_ME, {
     variables: { username: Auth.getProfile().data.username },
   });
-  console.log(data);
+
+  const [removeBook] = useMutation(REMOVE_BOOK);
+
   const userData = data;
   // setUserData(data);
 
@@ -56,7 +59,9 @@ const SavedBooks = () => {
   // }, [userDataLength]);
 
   // create function that accepts the book's mongo _id value as param and deletes the book from the database
+
   const handleDeleteBook = async (bookId) => {
+    console.log(bookId);
     const token = Auth.loggedIn() ? Auth.getToken() : null;
 
     if (!token) {
@@ -64,14 +69,17 @@ const SavedBooks = () => {
     }
 
     try {
-      const response = await deleteBook(bookId, token);
+      // const response = await deleteBook(bookId, token);
+      const { data } = await removeBook({
+        variables: { bookId },
+      });
 
-      if (!response.ok) {
-        throw new Error("something went wrong!");
-      }
+      // if (!response.ok) {
+      //   throw new Error("something went wrong!");
+      // }
 
-      const updatedUser = await response.json();
-      setUserData(updatedUser);
+      // const updatedUser = await response.json();
+      // setUserData(updatedUser);
       // upon success, remove book's id from localStorage
       removeBookId(bookId);
     } catch (err) {
@@ -93,6 +101,7 @@ const SavedBooks = () => {
       </div>
       <Container>
         <h2 className="pt-5">
+          {/* using userData.me to pull all user data */}
           {userData.me.savedBooks.length
             ? `Viewing ${userData.me.savedBooks.length} saved ${userData.me.savedBooks.length === 1 ? "book" : "books"}:`
             : "You have no saved books!"}

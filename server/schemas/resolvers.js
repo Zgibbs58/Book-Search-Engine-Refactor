@@ -32,36 +32,36 @@ const resolvers = {
       const user = await User.findOne({ email });
 
       if (!user) {
-        throw new AuthenticationError();
+        throw AuthenticationError;
       }
 
       const correctPw = await user.isCorrectPassword(password);
 
       if (!correctPw) {
-        throw new AuthenticationError();
+        throw AuthenticationError;
       }
 
       const token = signToken(user);
 
       return { token, user };
     },
-    saveBook: async (parent, { bookData }, context) => {
+    saveBook: async (parent, { _id, ...bookData }, context) => {
       if (context.user) {
-        const updatedUser = await User.findByIdAndUpdate({ _id: context.user._id }, { $push: { savedBooks: bookData } }, { new: true });
+        const updatedUser = await User.findByIdAndUpdate({ _id: context.user._id }, { $addToSet: { savedBooks: { ...bookData } } }, { new: true });
 
         return updatedUser;
       }
 
-      throw new AuthenticationError();
+      throw AuthenticationError;
     },
     removeBook: async (parent, { bookId }, context) => {
       if (context.user) {
-        const updatedUser = await User.findByIdAndUpdate({ _id: context.user._id }, { $pull: { savedBooks: { bookId: String } } }, { new: true });
+        const updatedUser = await User.findByIdAndUpdate({ _id: context.user._id }, { $pull: { savedBooks: { bookId } } }, { new: true });
 
         return updatedUser;
       }
 
-      throw new AuthenticationError();
+      throw AuthenticationError;
     },
   },
 };

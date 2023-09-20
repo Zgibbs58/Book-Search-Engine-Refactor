@@ -58,24 +58,38 @@ const SearchBooks = () => {
 
   // create function to handle saving a book to our database
   const HandleSaveBook = async (bookId) => {
+    if (!Auth.loggedIn()) {
+      console.log("User is not logged in");
+      return;
+    }
+
     console.log(Auth.getProfile().data);
-    console.log(bookId);
     // find the book in `searchedBooks` state by the matching id
     const bookToSave = searchedBooks.find((book) => book.bookId === bookId);
 
-    // get token
-    const token = Auth.loggedIn() ? Auth.getToken() : null;
+    const _id = Auth.getProfile()._id;
 
-    if (!token) {
-      return false;
-    }
+    console.log({ ...bookToSave });
+    // get token
+    // const token = Auth.loggedIn() ? Auth.getToken() : null;
+
+    // if (!token) {
+    //   return false;
+    // }
 
     try {
+      console.log("id", Auth.getProfile().data._id, "bookId", bookId);
       // const response = await saveBook(bookToSave, token);
       const { data } = await saveBook({
-        // variables: { userId: Auth.getProfile().data._id, bookId: bookId },
-        variables: { ...bookToSave },
-        token: token,
+        variables: {
+          _id: _id,
+          bookId: bookToSave.bookId,
+          authors: bookToSave.authors,
+          description: bookToSave.description,
+          title: bookToSave.title,
+          image: bookToSave.image,
+        },
+        // variables: { ...bookToSave },
       });
 
       // if (!response.ok) {

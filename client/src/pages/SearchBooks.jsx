@@ -38,7 +38,7 @@ const SearchBooks = () => {
       if (!response.ok) {
         throw new Error("something went wrong!");
       }
-
+      // Grabbing all of the book data fromt eh google books api and saving it to items
       const { items } = await response.json();
 
       const bookData = items.map((book) => ({
@@ -58,37 +58,36 @@ const SearchBooks = () => {
 
   // create function to handle saving a book to our database
   const HandleSaveBook = async (bookId) => {
-    if (!Auth.loggedIn()) {
-      console.log("User is not logged in");
-      return;
-    }
-
     console.log(Auth.getProfile().data);
     // find the book in `searchedBooks` state by the matching id
     const bookToSave = searchedBooks.find((book) => book.bookId === bookId);
 
-    const _id = Auth.getProfile()._id;
+    // const _id = Auth.getProfile()._id;
 
     console.log({ ...bookToSave });
     // get token
-    // const token = Auth.loggedIn() ? Auth.getToken() : null;
+    const token = Auth.loggedIn() ? Auth.getToken() : null;
 
-    // if (!token) {
-    //   return false;
-    // }
+    if (!token) {
+      return false;
+    }
 
     try {
       console.log("id", Auth.getProfile().data._id, "bookId", bookId);
       // const response = await saveBook(bookToSave, token);
+      // spreading bookToSave data into an object of key value pairs to pass into saveBook mutation
       const { data } = await saveBook({
         variables: {
-          _id: _id,
-          bookId: bookToSave.bookId,
-          authors: bookToSave.authors,
-          description: bookToSave.description,
-          title: bookToSave.title,
-          image: bookToSave.image,
+          bookData: { ...bookToSave },
         },
+        // variables: {
+        //   _id: Auth.getProfile().data._id,
+        //   bookId: bookToSave.bookId,
+        //   authors: bookToSave.authors,
+        //   description: bookToSave.description,
+        //   title: bookToSave.title,
+        //   image: bookToSave.image,
+        // },
         // variables: { ...bookToSave },
       });
 

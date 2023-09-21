@@ -24,15 +24,22 @@ export const ADD_USER = gql`
   }
 `;
 
+// https://www.apollographql.com/tutorials/side-quest-intermediate-schema-design/03-the-input-type
+// BookInput is an input type in typeDefs to group argument fields together.
+
 export const SAVE_BOOK = gql`
-  mutation saveBook($_id: ID!) {
-    saveBook(_id: $_id) {
+  mutation saveBook($bookData: BookInput!) {
+    saveBook(bookData: $bookData) {
+      _id
+      username
+      email
       savedBooks {
-        bookId
         authors
+        bookId
         description
-        title
         image
+        title
+        link
       }
     }
   }

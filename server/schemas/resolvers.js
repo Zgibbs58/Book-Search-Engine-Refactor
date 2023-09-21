@@ -3,21 +3,13 @@ const { signToken, AuthenticationError } = require("../utils/auth");
 const { console } = require("console");
 
 const resolvers = {
-  // Query: {
-  //   me: async (parent, args, context) => {
-  //     if (context.user) {
-  //       const userData = await User.findOne({ _id: context.user._id }).populate("books");
-
-  //       return userData;
-  //     }
-
-  //     throw new AuthenticationError("Not logged in");
-  //   },
-  // },
-
   Query: {
-    me: async (parent, { username }) => {
-      return User.findOne({ username });
+    me: async (parent, args, context) => {
+      if (context.user) {
+        return await User.findOne({ _id: context.user._id }).select("-__v -password");
+      }
+
+      throw new AuthenticationError("Please login to see your profile.");
     },
   },
 
@@ -45,14 +37,14 @@ const resolvers = {
 
       return { token, user };
     },
-    saveBook: async (parent, { _id, ...bookData }, context) => {
+    saveBook: async (parent, { bookData }, context) => {
       if (context.user) {
-        const updatedUser = await User.findByIdAndUpdate({ _id: context.user._id }, { $addToSet: { savedBooks: { ...bookData } } }, { new: true });
+        const updatedUser = await User.findByIdAndUpdate({ _id: context.user._id }, { $addToSet: { savedBooks: bookData } }, { new: true });
 
         return updatedUser;
       }
 
-      throw AuthenticationError;
+      throw new AuthenticationError("You must be logged in.");
     },
     removeBook: async (parent, { bookId }, context) => {
       if (context.user) {

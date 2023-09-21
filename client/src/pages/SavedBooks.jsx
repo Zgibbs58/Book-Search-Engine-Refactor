@@ -11,24 +11,26 @@ import { removeBookId } from "../utils/localStorage";
 const SavedBooks = () => {
   // const [userData, setUserData] = useState({});
 
-  const { loading, error, data } = useQuery(GET_ME, {
-    variables: { username: Auth.getProfile().data.username },
-  });
+  const { loading, data } = useQuery(GET_ME);
+  // const { loading, error, data } = useQuery(GET_ME, {
+  //   variables: { username: Auth.getProfile().data.username },
+  // });
 
   const [removeBook] = useMutation(REMOVE_BOOK);
 
-  const userData = data;
+  // If data.me exists set it to userData if not an empty object
+  const userData = data?.me || {};
   // setUserData(data);
 
   if (loading) {
     return <div>Loading...</div>;
   }
 
-  if (error) {
-    return error.message;
-  }
+  // if (err) {
+  //   return err.message;
+  // }
 
-  console.log("userdata", userData.me);
+  console.log("userdata", userData);
 
   // use this to determine if `useEffect()` hook needs to run again
   // const userDataLength = Object.keys(userData).length;
@@ -102,12 +104,12 @@ const SavedBooks = () => {
       <Container>
         <h2 className="pt-5">
           {/* using userData.me to pull all user data */}
-          {userData.me.savedBooks.length
-            ? `Viewing ${userData.me.savedBooks.length} saved ${userData.me.savedBooks.length === 1 ? "book" : "books"}:`
+          {userData.savedBooks.length
+            ? `Viewing ${userData.savedBooks.length} saved ${userData.savedBooks.length === 1 ? "book" : "books"}:`
             : "You have no saved books!"}
         </h2>
         <Row>
-          {userData.me.savedBooks.map((book) => {
+          {userData.savedBooks.map((book) => {
             return (
               <Col key={book.bookId} md="4">
                 <Card border="dark">
@@ -128,6 +130,42 @@ const SavedBooks = () => {
       </Container>
     </>
   );
+  // return (
+  //   <>
+  //     <div className="text-light bg-dark p-5">
+  //       <Container>
+  //         <h1>Viewing saved books!</h1>
+  //       </Container>
+  //     </div>
+  //     <Container>
+  //       <h2 className="pt-5">
+  //         {/* using userData.me to pull all user data */}
+  //         {userData.me.savedBooks.length
+  //           ? `Viewing ${userData.me.savedBooks.length} saved ${userData.me.savedBooks.length === 1 ? "book" : "books"}:`
+  //           : "You have no saved books!"}
+  //       </h2>
+  //       <Row>
+  //         {userData.me.savedBooks.map((book) => {
+  //           return (
+  //             <Col key={book.bookId} md="4">
+  //               <Card border="dark">
+  //                 {book.image ? <Card.Img src={book.image} alt={`The cover for ${book.title}`} variant="top" /> : null}
+  //                 <Card.Body>
+  //                   <Card.Title>{book.title}</Card.Title>
+  //                   <p className="small">Authors: {book.authors}</p>
+  //                   <Card.Text>{book.description}</Card.Text>
+  //                   <Button className="btn-block btn-danger" onClick={() => handleDeleteBook(book.bookId)}>
+  //                     Delete this Book!
+  //                   </Button>
+  //                 </Card.Body>
+  //               </Card>
+  //             </Col>
+  //           );
+  //         })}
+  //       </Row>
+  //     </Container>
+  //   </>
+  // );
 };
 
 export default SavedBooks;

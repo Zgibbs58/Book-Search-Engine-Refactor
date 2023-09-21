@@ -62,8 +62,15 @@ const SavedBooks = () => {
 
   // create function that accepts the book's mongo _id value as param and deletes the book from the database
 
-  const handleDeleteBook = async (bookId) => {
-    console.log(bookId);
+  const handleDeleteBook = async (book) => {
+    console.log(book);
+    console.log({
+      bookId: book.bookId,
+      authors: book.authors,
+      title: book.title,
+      description: book.description,
+      image: book.image,
+    });
     const token = Auth.loggedIn() ? Auth.getToken() : null;
 
     if (!token) {
@@ -73,7 +80,15 @@ const SavedBooks = () => {
     try {
       // const response = await deleteBook(bookId, token);
       const { data } = await removeBook({
-        variables: { bookId },
+        variables: {
+          bookData: {
+            bookId: book.bookId,
+            authors: book.authors,
+            title: book.title,
+            description: book.description,
+            image: book.image,
+          },
+        },
       });
 
       // if (!response.ok) {
@@ -83,7 +98,7 @@ const SavedBooks = () => {
       // const updatedUser = await response.json();
       // setUserData(updatedUser);
       // upon success, remove book's id from localStorage
-      removeBookId(bookId);
+      removeBookId(book.bookId);
     } catch (err) {
       console.error(err);
     }
@@ -118,7 +133,7 @@ const SavedBooks = () => {
                     <Card.Title>{book.title}</Card.Title>
                     <p className="small">Authors: {book.authors}</p>
                     <Card.Text>{book.description}</Card.Text>
-                    <Button className="btn-block btn-danger" onClick={() => handleDeleteBook(book.bookId)}>
+                    <Button className="btn-block btn-danger" onClick={() => handleDeleteBook(book)}>
                       Delete this Book!
                     </Button>
                   </Card.Body>

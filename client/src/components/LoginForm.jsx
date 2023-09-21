@@ -27,19 +27,12 @@ const LoginForm = () => {
       event.preventDefault();
       event.stopPropagation();
     }
-    // console log to check values
-    console.log(userFormData);
 
     try {
-      // const response = await loginUser(userFormData);
       const { data } = await login({
         variables: { ...userFormData },
       });
 
-      // if (!response.ok) {
-      //   throw new Error("something went wrong!");
-      // }
-      console.log("data", data);
       Auth.login(data.login.token);
 
       // const { token, user } = await response.json();
